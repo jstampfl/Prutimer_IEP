@@ -1,0 +1,39 @@
+Notes for Prutimer_IEP
+
+Hardware:
+
+Beaglebone Black A5
+HC-SR04 ultrasonic sensor
+5v 2amp power supply
+
+Software:
+
+Debian 7-16, bone60
+gcc
+
+Texas Instruments "am335x_pru_package-master"
+pasm (PRUSS assembler)
+
+Hardware connections:
+
+5v from power supply to VCC on HC-SR04 and pin P9.06
+GND from power supply to GND on HC-SR04 and GND on the BBB
+pin p9.12 on BBB to trigger on HC-SR04 (worked without level shifting)
+pin p8.15 on BBB will go to echo on HC-SR04 BUT NEEDS LEVEL SHIFTING. 
+
+Devicetree:
+
+prujts-00A0.dts - enables the PRUSS and configures P8.15 (ofset 0x3c) for PRU input.
+
+Program:
+
+pi.c - initializes the PRU, controls gpio P9.12 as the trigger using SYSFS.  Sends pulse to HC-SR04
+         and waits for PRU signal, then reads the PRU0 data memory and computes and prints the
+        distance.
+
+pi.p - waits for the pulse to go high, starts the IEP counter,  waits for the pulse to go low, stops the
+          IEP counter, moves the IEP count to PRU0 local data memory, clears the count and sends signal
+          to Linux.
+
+
+This example is almost identical to the Prutimer example.  The two timers give identical results.
